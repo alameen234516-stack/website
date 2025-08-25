@@ -136,6 +136,26 @@
             background-repeat: no-repeat;
             background-position: center;
         }
+        .blog-post-card {
+            display: flex;
+            flex-direction: column;
+            background-color: #1f2937;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+        }
+        .blog-post-card:hover {
+            transform: translateY(-5px);
+        }
+        .blog-post-image {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        .blog-post-content {
+            padding: 1.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-200 min-h-screen">
@@ -143,8 +163,32 @@
     <!-- Three.js Canvas for 3D Background -->
     <canvas id="three-canvas"></canvas>
 
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full bg-gray-950/70 backdrop-blur-md z-50 p-4 shadow-lg rounded-b-xl">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="#hero" class="text-xl sm:text-2xl font-bold text-gradient-cyan">
+                Aimpill Private
+            </a>
+            <div class="hidden md:flex space-x-6">
+                <a href="#hero" class="text-gray-300 hover:text-cyan-400 transition duration-300 ease-in-out">Home</a>
+                <a href="#features" class="text-gray-300 hover:text-cyan-400 transition duration-300 ease-in-out">Features</a>
+                <a href="#pricing" class="text-gray-300 hover:text-cyan-400 transition duration-300 ease-in-out">Pricing</a>
+                <a href="#why-us" class="text-gray-300 hover:text-cyan-400 transition duration-300 ease-in-out">Why Us?</a>
+                <a href="#blog" class="text-gray-300 hover:text-cyan-400 transition duration-300 ease-in-out">Blog</a>
+                <a href="#legal" class="text-gray-300 hover:text-cyan-400 transition duration-300 ease-in-out">Legal</a>
+            </div>
+            <!-- Hamburger menu icon for mobile (optional for future use) -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-cyan-400 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+    <!-- End of Navigation Bar -->
+
     <!-- Hero Section -->
-    <section id="hero" class="flex flex-col items-center justify-center min-h-screen text-center px-4">
+    <section id="hero" class="flex flex-col items-center justify-center min-h-screen text-center px-4 pt-20">
         <h1 class="text-6xl sm:text-7xl md:text-8xl font-bold text-gradient-cyan">
             Aimpill Private
         </h1>
@@ -256,6 +300,37 @@
                 <li class="fade-in-item" style="animation-delay: 0.6s;"><span class="text-cyan-400 font-bold mr-2">&bull;</span> Very Lite: Aimpill is designed to be lightweight, ensuring it has minimal impact on your system's performance.</li>
             </ul>
         </section>
+
+        <!-- Blog Section -->
+        <section id="blog" class="section-padding">
+            <h2 class="text-4xl font-bold mb-8 text-cyan-300 text-center fade-in">Blog</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Single Blog Post Card -->
+                <div class="blog-post-card fade-in-item">
+                    <img src="https://cdn.discordapp.com/attachments/1389238534786781437/1408454286064619520/ChatGPT_Image_Aug_22_2025_07_14_07_AM.png?ex=68adc145&is=68ac6fc5&hm=49cdfe96ddc50ba07142c04856a57cad17f85d6f372641dea63d468667e62971&" alt="Free spoofer and cleaner" class="blog-post-image">
+                    <div class="blog-post-content">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Tournament Ready Spoofer + Cleaner</h3>
+                        <p class="text-gray-400 mb-4">
+                            We are excited to announce our brand new, free spoofer and cleaner.
+                        </p>
+                        <a href="#" class="inline-block bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:from-cyan-600 hover:to-sky-700 transition duration-300 ease-in-out">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legal Disclaimer Section -->
+        <section id="legal" class="section-padding">
+            <h2 class="text-4xl font-bold mb-8 text-cyan-300 text-center fade-in">Legal Disclaimer</h2>
+            <div class="card max-w-4xl mx-auto text-gray-400 space-y-4 text-sm">
+                <p>This website and the software offered are not affiliated with, endorsed, sponsored, or specifically approved by Epic Games, Inc. or any of its subsidiaries. All product names, logos, and brands are property of their respective owners. All company, product and service names used in this website are for identification purposes only. Use of these names, logos, and brands does not imply endorsement.</p>
+                <p>The use of this software may violate the terms of service of various games, including but not limited to Epic Games' Fortnite. The user assumes all responsibility and risk for their use of the software, and any consequences that may arise, including but not limited to account suspension or termination. We do not provide any guarantees, explicit or implied, regarding the safety or legality of the software.</p>
+                <p>By using this website and/or downloading our software, you acknowledge and agree to these terms. This disclaimer is subject to change without notice.</p>
+            </div>
+        </section>
+
     </div>
 
     <!-- The Cheat Menu Modal -->
