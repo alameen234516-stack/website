@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creed Ameen</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme-color: #00ffff; /* Default cyan color */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: block;
+            z-index: 0;
+        }
+
+        /* Custom styles for the card and other elements */
+        .card {
+            background-color: rgba(29, 32, 42, 0.9);
+            border: 1px solid #374151;
+            box-shadow: 0 0 20px var(--theme-color, rgba(0, 255, 255, 0.3)), 0 0 40px var(--theme-color, rgba(0, 255, 255, 0.2));
+            transition: transform 0.5s ease-in-out;
+            backdrop-filter: blur(5px); /* Adds a subtle blur effect to the card */
+        }
+
+        .card.is-floating {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .social-button {
+            background-color: #374151;
+            border: 1px solid #4B5563;
+            box-shadow: 0 0 10px var(--theme-color, rgba(0, 255, 255, 0.1));
+            transition: all 0.3s ease-in-out;
+        }
+
+        .social-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px var(--theme-color, rgba(0, 255, 255, 0.5));
+            background-color: #4B5563;
+        }
+
+        /* Animation for card floating effect */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Styles for the new controls panel */
+        .controls-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 30;
+            padding: 10px;
+            background-color: rgba(29, 32, 42, 0.7);
+            border: 1px solid #374151;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .controls-panel .color-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .controls-panel .color-box.selected {
+            border-color: #fff;
+        }
+        
+        /* Text glowing animation */
+        .glowing-text {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px var(--theme-color, #00ffff), 0 0 10px var(--theme-color, #00ffff);
+            }
+            to {
+                text-shadow: 0 0 10px var(--theme-color, #00ffff), 0 0 20px var(--theme-color, #00ffff), 0 0 30px var(--theme-color, #00ffff);
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .controls-panel {
+                top: auto;
+                bottom: 10px;
+                right: 50%;
+                transform: translateX(50%);
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: calc(100% - 20px);
+                justify-content: center;
+                gap: 5px;
+            }
+            .controls-panel .color-box {
+                width: 25px;
+                height: 25px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Main content card -->
+    <div id="main-card" class="relative z-10 p-8 rounded-2xl max-w-sm w-full text-center card opacity-0 scale-90 transition-all duration-1000">
+        <!-- Profile name with glowing effect -->
+        <h1 id="name-text" class="text-3xl font-bold mb-2 glowing-text">Creed Ameen!</h1>
+        <!-- Tagline with glowing effect -->
+        <p class="text-sm text-gray-400 mb-4 glowing-text">C++ developer</p>
+        <p class="text-sm text-gray-400 mb-6">I love eac!</p>
+
+        <!-- Social media links -->
+        <div class="flex justify-center space-x-4">
+            <!-- TikTok Button -->
+            <a href="https://www.tiktok.com/@aimpiller" target="_blank" class="flex items-center space-x-2 px-4 py-2 text-white rounded-xl transition-colors shadow-md social-button">
+                <span>TikTok</span>
+            </a>
+            
+            <!-- Discord Button -->
+            <a href="https://dsc.gg/aimpill" target="_blank" class="flex items-center space-x-2 px-4 py-2 text-white rounded-xl transition-colors shadow-md social-button">
+                <span>Discord</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+        <div class="flex space-x-2">
+            <!-- Color Pickers -->
+            <div id="cyan-color" class="color-box selected" style="background-color: #00ffff;"></div>
+            <div id="red-color" class="color-box" style="background-color: #ff0000;"></div>
+            <div id="green-color" class="color-box" style="background-color: #00ff00;"></div>
+            <div id="purple-color" class="color-box" style="background-color: #800080;"></div>
+        </div>
+    </div>
+
+    <!-- Three.js CDN for 3D animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        let scene, camera, renderer;
+        let particleSystem1, particleSystem2;
+        let sphere, cube, torus, dodecahedron, octahedron, cone, pyramid, grid;
+        let person; // The animated person object
+        let pointLight;
+        let pyramidRotationSpeed = 0.005; // Initial rotation speed for the pyramid
+        
+        // Mouse position for interaction
+        const mouse = new THREE.Vector2();
+        const targetMouse = new THREE.Vector2();
+        const initialCameraPosition = new THREE.Vector3(0, 0, 1000);
+
+        // Initialize the 3D scene
+        function init() {
+            scene = new THREE.Scene();
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.z = initialCameraPosition.z;
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+            
+            // --- Particle System 1 (large, slow particles) ---
+            const particleCount1 = 5000;
+            const particleGeometry1 = new THREE.BufferGeometry();
+            const positions1 = [];
+            
+            for (let i = 0; i < particleCount1; i++) {
+                const x = (Math.random() - 0.5) * 4000;
+                const y = Math.random() * 4000 - 2000;
+                const z = (Math.random() - 0.5) * 4000;
+                positions1.push(x, y, z);
+            }
+            
+            particleGeometry1.setAttribute('position', new THREE.Float32BufferAttribute(positions1, 3));
+            
+            const particleMaterial1 = new THREE.PointsMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                size: 10,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+            });
+            
+            particleSystem1 = new THREE.Points(particleGeometry1, particleMaterial1);
+            scene.add(particleSystem1);
+
+            // --- Particle System 2 (small, fast particles) ---
+            const particleCount2 = 10000;
+            const particleGeometry2 = new THREE.BufferGeometry();
+            const positions2 = [];
+            
+            for (let i = 0; i < particleCount2; i++) {
+                const x = (Math.random() - 0.5) * 2000;
+                const y = Math.random() * 2000 - 1000;
+                const z = (Math.random() - 0.5) * 2000;
+                positions2.push(x, y, z);
+            }
+            
+            particleGeometry2.setAttribute('position', new THREE.Float32BufferAttribute(positions2, 3));
+            
+            const particleMaterial2 = new THREE.PointsMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                size: 2,
+                transparent: true,
+                opacity: 0.5,
+                blending: THREE.AdditiveBlending,
+            });
+            
+            particleSystem2 = new THREE.Points(particleGeometry2, particleMaterial2);
+            scene.add(particleSystem2);
+
+            // --- Abstract Geometric Objects ---
+            const sphereGeometry = new THREE.IcosahedronGeometry(200, 1);
+            const sphereMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1,
+            });
+            sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            scene.add(sphere);
+
+            const cubeGeometry = new THREE.BoxGeometry(100, 100, 100);
+            const cubeMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1,
+            });
+            cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.position.set(400, -200, 50);
+            scene.add(cube);
+            
+            const torusGeometry = new THREE.TorusGeometry(80, 20, 16, 100);
+            const torusMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1,
+            });
+            torus = new THREE.Mesh(torusGeometry, torusMaterial);
+            torus.position.set(-400, 200, -50);
+            scene.add(torus);
+
+            const dodecahedronGeometry = new THREE.DodecahedronGeometry(150, 0);
+            const dodecahedronMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2,
+            });
+            dodecahedron = new THREE.Mesh(dodecahedronGeometry, dodecahedronMaterial);
+            dodecahedron.position.set(0, 0, -500);
+            scene.add(dodecahedron);
+
+            const octahedronGeometry = new THREE.OctahedronGeometry(120);
+            const octahedronMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15,
+            });
+            octahedron = new THREE.Mesh(octahedronGeometry, octahedronMaterial);
+            octahedron.position.set(250, 250, -250);
+            scene.add(octahedron);
+
+            const coneGeometry = new THREE.ConeGeometry(70, 150, 32);
+            const coneMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1,
+            });
+            cone = new THREE.Mesh(coneGeometry, coneMaterial);
+            cone.position.set(-250, -100, 250);
+            scene.add(cone);
+
+            // --- New Pyramid Object ---
+            const pyramidGeometry = new THREE.ConeGeometry(100, 150, 4);
+            const pyramidMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2,
+            });
+            pyramid = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
+            pyramid.position.set(300, 100, 300);
+            scene.add(pyramid);
+
+
+            // --- The Walking Person ---
+            const personGroup = new THREE.Group();
+            
+            const bodyGeometry = new THREE.CylinderGeometry(20, 20, 80, 16);
+            const bodyMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.8
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            
+            const headGeometry = new THREE.SphereGeometry(20, 32, 16);
+            const headMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.8
+            });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 50;
+            
+            personGroup.add(body);
+            personGroup.add(head);
+            personGroup.position.set(0, -450, -100);
+            
+            person = personGroup;
+            scene.add(person);
+
+            // --- Grid on the ground plane ---
+            const gridSize = 2000;
+            const gridDivisions = 40;
+            const gridColor = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color'));
+            grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor, gridColor);
+            grid.material.opacity = 0.1;
+            grid.material.transparent = true;
+            grid.position.y = -500;
+            scene.add(grid);
+
+            // --- Dynamic Light Source ---
+            pointLight = new THREE.PointLight(new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--theme-color')), 1, 1000);
+            pointLight.position.set(0, 0, 500);
+            scene.add(pointLight);
+
+            // Add event listeners for mouse and window resize
+            window.addEventListener('mousemove', onMouseMove, false);
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // Add hover interaction to the main card
+            const mainCard = document.getElementById('main-card');
+            mainCard.addEventListener('mouseenter', () => {
+                pyramidRotationSpeed = 0.02; // Speed up the pyramid on hover
+            });
+            mainCard.addEventListener('mouseleave', () => {
+                pyramidRotationSpeed = 0.005; // Slow down the pyramid when not hovered
+            });
+
+            // Add color changing functionality
+            document.querySelectorAll('.color-box').forEach(box => {
+                box.addEventListener('click', () => {
+                    document.querySelectorAll('.color-box').forEach(b => b.classList.remove('selected'));
+                    box.classList.add('selected');
+                    const newColor = box.style.backgroundColor;
+                    updateThemeColor(newColor);
+                });
+            });
+
+            // Animate card appearance
+            setTimeout(() => {
+                mainCard.style.opacity = '1';
+                mainCard.style.transform = 'scale(1)';
+                mainCard.classList.add('is-floating');
+            }, 500);
+        }
+
+        // Function to update all colors
+        function updateThemeColor(color) {
+            // Update CSS variables for UI elements
+            document.documentElement.style.setProperty('--theme-color', color);
+            const hexColor = new THREE.Color(color).getHex();
+
+            // Update Three.js materials
+            particleSystem1.material.color.set(hexColor);
+            particleSystem2.material.color.set(hexColor);
+            sphere.material.color.set(hexColor);
+            cube.material.color.set(hexColor);
+            torus.material.color.set(hexColor);
+            dodecahedron.material.color.set(hexColor);
+            octahedron.material.color.set(hexColor);
+            cone.material.color.set(hexColor);
+            pyramid.material.color.set(hexColor); // Update the new pyramid's color
+            person.children[0].material.color.set(hexColor);
+            person.children[1].material.color.set(hexColor);
+            pointLight.color.set(hexColor);
+            grid.material.color.set(hexColor);
+            
+            // Update UI elements that use the theme color
+            document.querySelector('.card').style.boxShadow = `0 0 20px ${color}, 0 0 40px ${color}`;
+            document.querySelectorAll('.social-button').forEach(btn => {
+                btn.style.boxShadow = `0 0 10px ${color}`;
+            });
+        }
+
+        // Handle mouse movement for interaction
+        function onMouseMove(event) {
+            targetMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            targetMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        // Handle window resizing
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // The main animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Smoothly move the mouse position for a more natural feel
+            mouse.x += (targetMouse.x - mouse.x) * 0.05;
+            mouse.y += (targetMouse.y - mouse.y) * 0.05;
+
+            // Animate the camera's position for a subtle parallax effect
+            camera.position.x += (mouse.x * 500 - camera.position.x) * 0.02;
+            camera.position.y += (mouse.y * 500 - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+
+            // Animate the abstract geometry
+            sphere.rotation.x += 0.001;
+            sphere.rotation.y += 0.001;
+            sphere.rotation.z += 0.001;
+
+            cube.rotation.x += 0.005;
+            cube.rotation.y += 0.005;
+            
+            torus.rotation.x += 0.003;
+            torus.rotation.y += 0.003;
+            
+            dodecahedron.rotation.x += 0.002;
+            dodecahedron.rotation.y -= 0.003;
+
+            octahedron.rotation.x -= 0.004;
+            octahedron.rotation.y += 0.002;
+            
+            cone.rotation.y += 0.005;
+            pyramid.rotation.y += pyramidRotationSpeed; // Use the dynamic rotation speed
+
+            // Animate the walking person
+            person.position.z += 1;
+            person.position.x = Math.sin(person.position.z * 0.01) * 300; // Add a fun side-to-side walk
+            person.position.y = -450 + Math.sin(person.position.z * 0.02) * 5; // Adds a subtle bobbing motion
+            if (person.position.z > 2000) {
+                person.position.z = -1000;
+            }
+
+            // Animate the light source
+            pointLight.position.x = Math.sin(Date.now() * 0.001) * 300;
+            pointLight.position.y = Math.cos(Date.now() * 0.001) * 300;
+            
+            // Animate the grid's pulsing opacity
+            grid.material.opacity = 0.1 + (Math.sin(Date.now() * 0.002) + 1) * 0.05;
+
+            // Get the particle positions from the geometry
+            const positions1 = particleSystem1.geometry.attributes.position.array;
+            const positions2 = particleSystem2.geometry.attributes.position.array;
+
+            // Animate particles in system 1 (large, slow)
+            for (let i = 0; i < positions1.length / 3; i++) {
+                const i3 = i * 3;
+                positions1[i3 + 1] -= (i / positions1.length + 0.5);
+                positions1[i3] += mouse.x * 2;
+                
+                if (positions1[i3 + 1] < -2000) {
+                    positions1[i3 + 1] = 2000;
+                }
+            }
+
+            // Animate particles in system 2 (small, fast)
+            for (let i = 0; i < positions2.length / 3; i++) {
+                const i3 = i * 3;
+                positions2[i3 + 1] -= (i / positions2.length + 1); // Faster fall speed
+                positions2[i3] += mouse.x * 4; // More sensitive to mouse
+                
+                if (positions2[i3 + 1] < -1500) {
+                    positions2[i3 + 1] = 1500;
+                }
+            }
+            
+            // Update the particle geometries
+            particleSystem1.geometry.attributes.position.needsUpdate = true;
+            particleSystem2.geometry.attributes.position.needsUpdate = true;
+            
+            // Render the scene
+            renderer.render(scene, camera);
+        }
+
+        // Start the animation on window load.
+        window.onload = function () {
+            init();
+            animate();
+        };
+    </script>
+</body>
+</html>
